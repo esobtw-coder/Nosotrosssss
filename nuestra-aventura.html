@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Nuestra Aventura ⚔️</title>
+<meta name="theme-color" content="#0d0d1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #0d0d1a;
+  --bg2:    #111128;
+  --panel:  #1a1a2e;
+  --panel2: #16213e;
+  --gold:   #ffd700;
+  --gold2:  #ffec6e;
+  --red:    #e63946;
+  --green:  #4ecdc4;
+  --blue:   #457bff;
+  --purple: #c77dff;
+  --orange: #ff9f1c;
+  --white:  #e0e0f0;
+  --gray:   #6b6b8a;
+  --border: #ffd70044;
+  --pixel:  2px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  image-rendering: pixelated;
+}
+
+/* ── PIXEL BORDER UTILITY ── */
+.px-box {
+  border: 3px solid var(--gold);
+  box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--gold2), inset 0 0 0 3px var(--bg);
+  background: var(--panel);
+}
+.px-box-red { border-color: var(--red); box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--red); }
+.px-box-green { border-color: var(--green); box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--green); }
+.px-box-purple { border-color: var(--purple); box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--purple); }
+
+/* ── SCANLINE OVERLAY ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+}
+
+/* ── STARS BG ── */
+#stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.star { position: absolute; background: var(--white); animation: twinkle var(--d) ease-in-out infinite var(--delay); }
+@keyframes twinkle { 0%,100%{opacity:0.1;} 50%{opacity:1;} }
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; position: relative; z-index: 2; flex-direction: column; align-items: center; padding: 16px 16px 60px; }
+.screen.active { display: flex; }
+
+/* ══════════════════════════════
+   PANTALLA TÍTULO
+══════════════════════════════ */
+#inicio {
+  justify-content: center;
+  text-align: center;
+  gap: 0;
+}
+
+.titulo-pixel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1.1rem, 5vw, 1.6rem);
+  color: var(--gold);
+  text-shadow: 4px 4px 0 #b8860b, -2px -2px 0 #b8860b;
+  line-height: 1.6;
+  margin-bottom: 8px;
+  animation: titlePulse 2s ease-in-out infinite;
+}
+@keyframes titlePulse { 0%,100%{text-shadow:4px 4px 0 #b8860b,-2px -2px 0 #b8860b;} 50%{text-shadow:4px 4px 0 #ff9f1c,-2px -2px 0 #ff9f1c, 0 0 20px #ffd700;} }
+
+.subtitulo-pixel {
+  font-family: 'VT323', monospace;
+  font-size: 1.3rem;
+  color: var(--purple);
+  margin-bottom: 30px;
+  letter-spacing: 0.1em;
+}
+
+/* SPRITE DEL TÍTULO — hecho con CSS */
+.sprite-title {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 28px;
+  font-size: 3.5rem;
+  animation: heroFloat 2s ease-in-out infinite;
+}
+@keyframes heroFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+
+.menu-opciones { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 340px; }
+
+.btn-pixel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  padding: 14px 20px;
+  border: 3px solid var(--gold);
+  background: var(--panel);
+  color: var(--gold);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  box-shadow: 4px 4px 0 #b8860b;
+  transition: all 0.1s;
+  text-align: center;
+  position: relative;
+}
+.btn-pixel:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 #b8860b; }
+.btn-pixel::before { content: '▶ '; }
+.btn-pixel.red { border-color: var(--red); color: var(--red); box-shadow: 4px 4px 0 #8b0000; }
+.btn-pixel.red:active { box-shadow: 1px 1px 0 #8b0000; }
+.btn-pixel.green { border-color: var(--green); color: var(--green); box-shadow: 4px 4px 0 #1a7a76; }
+.btn-pixel.green:active { box-shadow: 1px 1px 0 #1a7a76; }
+.btn-pixel.purple { border-color: var(--purple); color: var(--purple); box-shadow: 4px 4px 0 #5a009a; }
+.btn-pixel.sm { font-size: 0.5rem; padding: 10px 16px; box-shadow: 3px 3px 0 #b8860b; }
+
+/* CURSOR PARPADEANTE */
+.cursor { display: inline-block; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+/* ══════════════════════════════
+   CREAR PERSONAJE
+══════════════════════════════ */
+#crear-personaje { gap: 14px; }
+
+.pixel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.75rem;
+  color: var(--gold);
+  text-align: center;
+  margin-top: 10px;
+  text-shadow: 2px 2px 0 #b8860b;
+}
+.pixel-sub { font-size: 1rem; color: var(--gray); text-align: center; margin-bottom: 4px; }
+
+.jugador-tabs {
+  display: flex;
+  width: 100%;
+  max-width: 400px;
+  border: 3px solid var(--gold);
+  box-shadow: 4px 4px 0 #b8860b;
+}
+.jtab {
+  flex: 1;
+  padding: 10px;
+  background: var(--panel);
+  color: var(--gray);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+}
+.jtab.active { background: var(--gold); color: var(--bg); }
+
+.clases-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+  max-width: 400px;
+}
+.clase-card {
+  background: var(--panel);
+  border: 3px solid var(--gray);
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.1s;
+  position: relative;
+}
+.clase-card:active { transform: translate(2px,2px); }
+.clase-card.selected { border-color: var(--gold); background: #ffd70015; box-shadow: 3px 3px 0 #b8860b; }
+.clase-emoji { font-size: 2rem; display: block; margin-bottom: 6px; }
+.clase-nombre { font-family: 'Press Start 2P', monospace; font-size: 0.38rem; color: var(--gold2); display: block; margin-bottom: 4px; line-height: 1.5; }
+.clase-desc { font-size: 0.75rem; color: var(--gray); display: block; }
+
+.stats-box {
+  width: 100%;
+  max-width: 400px;
+  background: var(--panel);
+  border: 3px solid var(--gold);
+  box-shadow: 4px 4px 0 #b8860b;
+  padding: 14px;
+}
+.stat-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.stat-row:last-child { margin-bottom: 0; }
+.stat-lbl { font-family: 'Press Start 2P', monospace; font-size: 0.4rem; color: var(--gold2); width: 60px; }
+.stat-bar-bg { flex: 1; height: 10px; background: #111; border: 2px solid var(--gray); position: relative; }
+.stat-fill { height: 100%; transition: width 0.4s steps(10); }
+.stat-fill.f { background: repeating-linear-gradient(90deg,var(--red) 0,var(--red) 6px,#8b0000 6px,#8b0000 8px); }
+.stat-fill.m { background: repeating-linear-gradient(90deg,var(--purple) 0,var(--purple) 6px,#5a009a 6px,#5a009a 8px); }
+.stat-fill.e { background: repeating-linear-gradient(90deg,var(--gold) 0,var(--gold) 6px,#b8860b 6px,#b8860b 8px); }
+.stat-fill.d { background: repeating-linear-gradient(90deg,var(--blue) 0,var(--blue) 6px,#1a3aaa 6px,#1a3aaa 8px); }
+
+/* ══════════════════════════════
+   HUB
+══════════════════════════════ */
+#hub { gap: 12px; padding-top: 20px; }
+
+.hub-nivel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: var(--gold);
+  border: 2px solid var(--gold);
+  padding: 5px 14px;
+  background: var(--panel);
+  letter-spacing: 0.05em;
+  box-shadow: 3px 3px 0 #b8860b;
+}
+
+.hub-heroes {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+}
+.hero-card {
+  flex: 1;
+  background: var(--panel);
+  border: 3px solid var(--gold);
+  box-shadow: 4px 4px 0 #b8860b;
+  padding: 12px 8px;
+  text-align: center;
+}
+.hero-spr { font-size: 2.5rem; display: block; animation: heroIdle 1.5s ease-in-out infinite; }
+.hero-spr:nth-child(1) { animation-delay: -0.75s; }
+@keyframes heroIdle { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
+.hero-name { font-family: 'Press Start 2P', monospace; font-size: 0.45rem; color: var(--gold2); margin: 6px 0 3px; display: block; }
+.hero-clase-lbl { font-size: 0.85rem; color: var(--gray); }
+
+.xp-section { width: 100%; max-width: 420px; }
+.xp-lbl { font-family: 'Press Start 2P', monospace; font-size: 0.45rem; color: var(--gold); margin-bottom: 5px; }
+.xp-bar-bg { height: 14px; background: #111; border: 3px solid var(--gold); position: relative; overflow: hidden; }
+.xp-fill { height: 100%; background: repeating-linear-gradient(90deg,var(--gold) 0,var(--gold) 6px,#b8860b 6px,#b8860b 8px); transition: width 0.8s steps(20); }
+.xp-num { font-size: 0.85rem; color: var(--gray); margin-top: 3px; text-align: right; }
+
+.hub-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+}
+.hub-btn {
+  background: var(--panel);
+  border: 3px solid var(--gold);
+  box-shadow: 4px 4px 0 #b8860b;
+  padding: 16px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.1s;
+  position: relative;
+}
+.hub-btn:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 #b8860b; }
+.hub-btn.wide { grid-column: span 2; }
+.hub-btn.red { border-color: var(--red); box-shadow: 4px 4px 0 #8b0000; }
+.hub-btn.red:active { box-shadow: 1px 1px 0 #8b0000; }
+.hub-btn.green { border-color: var(--green); box-shadow: 4px 4px 0 #1a7a76; }
+.hub-btn.purple { border-color: var(--purple); box-shadow: 4px 4px 0 #5a009a; }
+.hub-btn-ico { font-size: 2rem; display: block; margin-bottom: 6px; }
+.hub-btn-lbl { font-family: 'Press Start 2P', monospace; font-size: 0.4rem; color: var(--gold2); display: block; margin-bottom: 3px; line-height: 1.6; }
+.hub-btn-sub { font-size: 0.8rem; color: var(--gray); }
+
+/* ══════════════════════════════
+   TOP BAR
+══════════════════════════════ */
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 10px;
+}
+.back-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  padding: 8px 12px;
+  border: 3px solid var(--gold);
+  background: var(--panel);
+  color: var(--gold);
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #b8860b;
+}
+.back-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #b8860b; }
+.top-title { font-family: 'Press Start 2P', monospace; font-size: 0.6rem; color: var(--gold); text-shadow: 2px 2px 0 #b8860b; line-height: 1.5; }
+
+/* ══════════════════════════════
+   MAPA
+══════════════════════════════ */
+#mapa { gap: 10px; }
+
+.zona-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--panel);
+  border: 3px solid var(--gold);
+  box-shadow: 4px 4px 0 #b8860b;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.1s;
+  position: relative;
+}
+.zona-card:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 #b8860b; }
+.zona-card.bloqueada { border-color: var(--gray); box-shadow: 4px 4px 0 #333; opacity: 0.5; cursor: not-allowed; }
+.zona-top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.zona-emoji-big { font-size: 2.2rem; }
+.zona-txt { flex: 1; }
+.zona-nombre { font-family: 'Press Start 2P', monospace; font-size: 0.5rem; color: var(--gold); line-height: 1.6; margin-bottom: 4px; }
+.zona-desc { font-size: 0.9rem; color: var(--gray); }
+.zona-prog { font-family: 'Press Start 2P', monospace; font-size: 0.4rem; color: var(--green); }
+.zona-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.zpill {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border: 2px solid var(--gray);
+  color: var(--gray);
+}
+.zpill.done { border-color: var(--green); color: var(--green); }
+
+/* ══════════════════════════════
+   MISIONES
+══════════════════════════════ */
+#misiones-screen { gap: 12px; }
+
+.mision-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--panel);
+  border: 3px solid var(--gold);
+  box-shadow: 4px 4px 0 #b8860b;
+  padding: 16px;
+}
+.mision-card.done-card { border-color: var(--green); box-shadow: 4px 4px 0 #1a7a76; }
+.mc-top { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
+.mc-ico { font-size: 2rem; }
+.mc-info { flex: 1; }
+.mc-nombre { font-family: 'Press Start 2P', monospace; font-size: 0.48rem; color: var(--gold); line-height: 1.6; margin-bottom: 5px; }
+.mc-historia { font-size: 1rem; color: var(--gray); font-style: italic; line-height: 1.3; }
+.mc-tarea {
+  border: 2px solid var(--gold);
+  padding: 10px;
+  font-size: 0.95rem;
+  color: var(--white);
+  margin-bottom: 10px;
+  background: #ffd70008;
+  line-height: 1.4;
+}
+.mc-recomp { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.rc { font-size: 0.8rem; padding: 3px 8px; border: 2px solid var(--gold); color: var(--gold2); }
+.btn-completar-px {
+  width: 100%;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  padding: 12px;
+  border: 3px solid var(--green);
+  background: var(--panel);
+  color: var(--green);
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #1a7a76;
+  letter-spacing: 0.05em;
+}
+.btn-completar-px:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 #1a7a76; }
+.done-badge { font-family: 'Press Start 2P', monospace; font-size: 0.4rem; color: var(--green); text-align: center; padding: 8px; line-height: 1.6; }
+
+/* ══════════════════════════════
+   INVENTARIO
+══════════════════════════════ */
+#inventario-screen { gap: 10px; }
+
+.inv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+}
+.inv-item {
+  background: var(--panel);
+  border: 3px solid var(--gold);
+  box-shadow: 3px 3px 0 #b8860b;
+  padding: 14px 10px;
+  text-align: center;
+}
+.inv-item.locked { border-color: var(--gray); box-shadow: 3px 3px 0 #333; opacity: 0.35; filter: grayscale(1); }
+.inv-ico { font-size: 2rem; display: block; margin-bottom: 6px; }
+.inv-name { font-family: 'Press Start 2P', monospace; font-size: 0.38rem; color: var(--gold2); display: block; margin-bottom: 4px; line-height: 1.6; }
+.inv-desc { font-size: 0.75rem; color: var(--gray); }
+
+/* ══════════════════════════════
+   COMBATE
+══════════════════════════════ */
+#combate-screen { gap: 10px; }
+
+.arena {
+  width: 100%;
+  max-width: 420px;
+  background: var(--panel2);
+  border: 3px solid var(--red);
+  box-shadow: 4px 4px 0 #8b0000;
+  padding: 16px;
+}
+
+.fighters {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  gap: 8px;
+}
+.fighter { flex: 1; text-align: center; }
+.fighter-spr { font-size: 2.8rem; display: block; margin-bottom: 6px; }
+.fighter-name { font-family: 'Press Start 2P', monospace; font-size: 0.45rem; color: var(--white); display: block; margin-bottom: 5px; }
+.hp-bar-bg { height: 12px; background: #111; border: 2px solid var(--gray); margin-bottom: 2px; }
+.hp-fill { height: 100%; background: repeating-linear-gradient(90deg,var(--green) 0,var(--green) 4px,#1a7a76 4px,#1a7a76 6px); transition: width 0.4s steps(8); }
+.hp-fill.low { background: repeating-linear-gradient(90deg,var(--red) 0,var(--red) 4px,#8b0000 4px,#8b0000 6px); }
+.hp-num { font-size: 0.8rem; color: var(--gray); }
+
+.vs-txt {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem;
+  color: var(--red);
+  text-shadow: 2px 2px 0 #8b0000;
+  align-self: center;
+  animation: vsPulse 1s ease-in-out infinite;
+}
+@keyframes vsPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
+
+.combat-log {
+  background: #111;
+  border: 2px solid var(--gray);
+  padding: 10px;
+  font-size: 0.95rem;
+  color: var(--green);
+  min-height: 60px;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.combat-log::before { content: '> '; color: var(--gold); }
+
+.turno-lbl { font-family: 'Press Start 2P', monospace; font-size: 0.42rem; color: var(--gold); text-align: center; margin-bottom: 10px; line-height: 1.6; }
+
+.poderes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.poder-btn {
+  background: var(--panel);
+  border: 2px solid var(--gold);
+  box-shadow: 3px 3px 0 #b8860b;
+  padding: 10px 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.1s;
+}
+.poder-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #b8860b; }
+.poder-btn:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
+.pb-ico { font-size: 1.4rem; display: block; margin-bottom: 3px; }
+.pb-name { font-family: 'Press Start 2P', monospace; font-size: 0.38rem; color: var(--gold2); display: block; margin-bottom: 2px; line-height: 1.5; }
+.pb-dmg { font-size: 0.75rem; color: var(--gray); }
+
+/* ══════════════════════════════
+   MODAL RECOMPENSA
+══════════════════════════════ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal-box {
+  background: var(--panel);
+  border: 4px solid var(--gold);
+  box-shadow: 6px 6px 0 #b8860b, -3px -3px 0 var(--gold2);
+  padding: 28px 20px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+}
+.modal-ico { font-size: 3rem; display: block; margin-bottom: 12px; animation: modalPop 0.4s steps(4) forwards; }
+@keyframes modalPop { from{transform:scale(0);} to{transform:scale(1);} }
+.modal-titulo { font-family: 'Press Start 2P', monospace; font-size: 0.6rem; color: var(--gold); line-height: 1.6; margin-bottom: 10px; }
+.modal-txt { font-size: 0.95rem; color: var(--gray); margin-bottom: 14px; line-height: 1.4; }
+.modal-items { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 16px; }
+.mi { font-size: 0.85rem; padding: 4px 10px; border: 2px solid var(--gold); color: var(--gold2); }
+
+/* ══════════════════════════════
+   PIXEL PARTICLES
+══════════════════════════════ */
+#pixels { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.px-particle {
+  position: absolute;
+  width: 4px; height: 4px;
+  animation: pxFloat var(--d) linear infinite var(--delay);
+  opacity: 0;
+}
+@keyframes pxFloat {
+  0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.4; }
+  100% { transform: translateY(-10px) translateX(var(--dx)); opacity: 0; }
+}
+
+/* ══════════════════════════════
+   NIVEL UP FLASH
+══════════════════════════════ */
+.level-flash {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.9);
+  flex-direction: column;
+  gap: 16px;
+}
+.level-flash.show { display: flex; animation: flashIn 0.3s steps(3); }
+@keyframes flashIn { from{opacity:0;} to{opacity:1;} }
+.lf-txt { font-family: 'Press Start 2P', monospace; font-size: clamp(0.8rem,4vw,1.2rem); color: var(--gold); text-shadow: 3px 3px 0 #b8860b; text-align: center; line-height: 1.8; animation: lvlPulse 0.5s steps(2) infinite; }
+@keyframes lvlPulse { 0%,100%{color:var(--gold);} 50%{color:var(--white);} }
+.lf-sub { font-size: 1.2rem; color: var(--purple); text-align: center; }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+<div id="pixels"></div>
+
+<!-- ══════════════════════════════
+     PANTALLA TÍTULO
+══════════════════════════════ -->
+<div id="inicio" class="screen active">
+  <div class="sprite-title">⚔️🛡️</div>
+  <div class="titulo-pixel">NUESTRA<br>AVENTURA</div>
+  <div class="subtitulo-pixel">~ La leyenda de Fede &amp; Luli ~<span class="cursor">█</span></div>
+
+  <div class="menu-opciones">
+    <button class="btn-pixel" onclick="irA('crear-personaje')">NUEVA PARTIDA</button>
+    <button class="btn-pixel green" onclick="cargarJuego()">CONTINUAR</button>
+  </div>
+
+  <div style="margin-top:30px;font-size:0.8rem;color:var(--gray);text-align:center;line-height:1.6;">
+    ✨ Completá misiones juntos<br>para desbloquear el reino ✨
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     CREAR PERSONAJE
+══════════════════════════════ -->
+<div id="crear-personaje" class="screen">
+  <div class="pixel-title">ELIGE TU CLASE</div>
+  <div class="pixel-sub">Cada héroe tiene poderes únicos</div>
+
+  <div class="jugador-tabs">
+    <button class="jtab active" onclick="selJugador('Fede')">⚔️ FEDE</button>
+    <button class="jtab" onclick="selJugador('Luli')">🔮 LULI</button>
+  </div>
+
+  <div class="clases-grid">
+    <div class="clase-card" onclick="selClase(0)">
+      <span class="clase-emoji">⚔️</span>
+      <span class="clase-nombre">GUERRERO</span>
+      <span class="clase-desc">Fuerza máxima</span>
+    </div>
+    <div class="clase-card" onclick="selClase(1)">
+      <span class="clase-emoji">🔮</span>
+      <span class="clase-nombre">MAGO</span>
+      <span class="clase-desc">Magia poderosa</span>
+    </div>
+    <div class="clase-card" onclick="selClase(2)">
+      <span class="clase-emoji">🏹</span>
+      <span class="clase-nombre">ARQUERO</span>
+      <span class="clase-desc">Veloz y preciso</span>
+    </div>
+    <div class="clase-card" onclick="selClase(3)">
+      <span class="clase-emoji">🌿</span>
+      <span class="clase-nombre">DRUIDA</span>
+      <span class="clase-desc">Cura y naturaleza</span>
+    </div>
+    <div class="clase-card" onclick="selClase(4)">
+      <span class="clase-emoji">🗡️</span>
+      <span class="clase-nombre">ASESINO</span>
+      <span class="clase-desc">Golpe en sombras</span>
+    </div>
+    <div class="clase-card" onclick="selClase(5)">
+      <span class="clase-emoji">👑</span>
+      <span class="clase-nombre">MONARCA</span>
+      <span class="clase-desc">Poder y carisma</span>
+    </div>
+  </div>
+
+  <div class="stats-box" id="stats-box" style="display:none;">
+    <div class="stat-row">
+      <div class="stat-lbl">⚔️ FUERZA</div>
+      <div class="stat-bar-bg"><div class="stat-fill f" id="sf" style="width:0%"></div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-lbl">🔮 MAGIA</div>
+      <div class="stat-bar-bg"><div class="stat-fill m" id="sm" style="width:0%"></div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-lbl">💫 ENCANTO</div>
+      <div class="stat-bar-bg"><div class="stat-fill e" id="se" style="width:0%"></div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-lbl">🛡️ DEFENSA</div>
+      <div class="stat-bar-bg"><div class="stat-fill d" id="sd" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <button class="btn-pixel" id="btn-conf" style="display:none;width:100%;max-width:400px;" onclick="confirmarClase()">CONFIRMAR CLASE</button>
+</div>
+
+<!-- ══════════════════════════════
+     HUB
+══════════════════════════════ -->
+<div id="hub" class="screen">
+  <div style="width:100%;max-width:420px;margin-bottom:4px;">
+    <button class="back-btn" onclick="volverANosotros()" style="font-size:0.38rem;padding:8px 14px;">◀ VOLVER AL NOSOTROS</button>
+  </div>
+  <div class="hub-nivel" id="hub-nivel">NIVEL 1 — AVENTUREROS NOVATOS</div>
+
+  <div class="hub-heroes">
+    <div class="hero-card">
+      <span class="hero-spr" id="hub-spr-fede">⚔️</span>
+      <span class="hero-name">FEDE</span>
+      <span class="hero-clase-lbl" id="hub-clase-fede">Sin clase</span>
+    </div>
+    <div class="hero-card">
+      <span class="hero-spr" id="hub-spr-luli">🔮</span>
+      <span class="hero-name">LULI</span>
+      <span class="hero-clase-lbl" id="hub-clase-luli">Sin clase</span>
+    </div>
+  </div>
+
+  <div class="xp-section">
+    <div class="xp-lbl">EXP ────────────────</div>
+    <div class="xp-bar-bg"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    <div class="xp-num" id="xp-num">0 / 100 XP</div>
+  </div>
+
+  <div class="hub-grid">
+    <div class="hub-btn wide" onclick="irA('mapa')">
+      <span class="hub-btn-ico">🗺️</span>
+      <span class="hub-btn-lbl">MAPA DEL REINO</span>
+      <span class="hub-btn-sub">Explorá el mundo</span>
+    </div>
+    <div class="hub-btn" onclick="irA('misiones-screen')">
+      <span class="hub-btn-ico">📜</span>
+      <span class="hub-btn-lbl">MISIONES</span>
+      <span class="hub-btn-sub">Quests activas</span>
+    </div>
+    <div class="hub-btn purple" onclick="irA('inventario-screen')">
+      <span class="hub-btn-ico">🎒</span>
+      <span class="hub-btn-lbl">INVENTARIO</span>
+      <span class="hub-btn-sub">Objetos mágicos</span>
+    </div>
+    <div class="hub-btn red" onclick="irA('combate-screen');iniciarCombate()">
+      <span class="hub-btn-ico">⚔️</span>
+      <span class="hub-btn-lbl">COMBATE</span>
+      <span class="hub-btn-sub">Duelo de héroes</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     MAPA
+══════════════════════════════ -->
+<div id="mapa" class="screen">
+  <div class="top-bar">
+    <button class="back-btn" onclick="irA('hub')">◀ VOLVER</button>
+    <div class="top-title">🗺️ MAPA</div>
+  </div>
+  <div id="mapa-cont" style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:10px;"></div>
+</div>
+
+<!-- ══════════════════════════════
+     MISIONES
+══════════════════════════════ -->
+<div id="misiones-screen" class="screen">
+  <div class="top-bar">
+    <button class="back-btn" onclick="irA('hub')">◀ VOLVER</button>
+    <div class="top-title">📜 MISIONES</div>
+  </div>
+  <div id="misiones-cont" style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:10px;"></div>
+</div>
+
+<!-- ══════════════════════════════
+     INVENTARIO
+══════════════════════════════ -->
+<div id="inventario-screen" class="screen">
+  <div class="top-bar">
+    <button class="back-btn" onclick="irA('hub')">◀ VOLVER</button>
+    <div class="top-title">🎒 INVENTARIO</div>
+  </div>
+  <div class="inv-grid" id="inv-cont"></div>
+</div>
+
+<!-- ══════════════════════════════
+     COMBATE
+══════════════════════════════ -->
+<div id="combate-screen" class="screen">
+  <div class="top-bar">
+    <button class="back-btn" onclick="irA('hub')">◀ VOLVER</button>
+    <div class="top-title">⚔️ ARENA</div>
+  </div>
+  <div class="arena">
+    <div class="fighters">
+      <div class="fighter">
+        <span class="fighter-spr" id="cb-spr-fede">⚔️</span>
+        <span class="fighter-name">FEDE</span>
+        <div class="hp-bar-bg"><div class="hp-fill" id="cb-hp-fede" style="width:100%"></div></div>
+        <div class="hp-num" id="cb-hp-fede-n">100/100</div>
+      </div>
+      <div class="vs-txt">VS</div>
+      <div class="fighter">
+        <span class="fighter-spr" id="cb-spr-luli">🔮</span>
+        <span class="fighter-name">LULI</span>
+        <div class="hp-bar-bg"><div class="hp-fill" id="cb-hp-luli" style="width:100%"></div></div>
+        <div class="hp-num" id="cb-hp-luli-n">100/100</div>
+      </div>
+    </div>
+    <div class="combat-log" id="combat-log">El duelo está por comenzar...</div>
+    <div class="turno-lbl" id="turno-lbl">⏳ TURNO DE FEDE</div>
+    <div class="poderes-grid" id="poderes-grid"></div>
+    <button class="btn-pixel green" id="btn-revancha" style="display:none;width:100%;" onclick="iniciarCombate()">REVANCHA!</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     MODAL RECOMPENSA
+══════════════════════════════ -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <span class="modal-ico" id="m-ico">🎉</span>
+    <div class="modal-titulo" id="m-titulo">MISION COMPLETADA!</div>
+    <div class="modal-txt" id="m-txt"></div>
+    <div class="modal-items" id="m-items"></div>
+    <button class="btn-pixel" style="width:100%;" onclick="cerrarModal()">CONTINUAR AVENTURA</button>
+  </div>
+</div>
+
+<!-- LEVEL UP FLASH -->
+<div class="level-flash" id="level-flash">
+  <div class="lf-txt" id="lf-txt">⭐ NIVEL UP! ⭐</div>
+  <div class="lf-sub" id="lf-sub"></div>
+</div>
+
+<script>
+// ══════════════════════════════
+// DATOS
+// ══════════════════════════════
+const CLASES = [
+  { nombre:'Guerrero', emoji:'⚔️', stats:{f:90,m:20,e:40,d:80},
+    poderes:[
+      {nombre:'GOLPE BRUTAL',emoji:'⚔️',dmg:[25,40],desc:'Ataque físico'},
+      {nombre:'ESCUDO HIERRO',emoji:'🛡️',dmg:[-15,-15],desc:'Defiende',escudo:true},
+      {nombre:'FURIA BERSERK',emoji:'🔥',dmg:[35,55],desc:'Ataque salvaje'},
+      {nombre:'TAJO RAPIDO',emoji:'💨',dmg:[15,25],desc:'Rápido y certero'},
+    ]},
+  { nombre:'Mago',emoji:'🔮',stats:{f:20,m:95,e:60,d:30},
+    poderes:[
+      {nombre:'BOLA DE FUEGO',emoji:'🔥',dmg:[30,45],desc:'Magia de fuego'},
+      {nombre:'RAYO HELADO',emoji:'❄️',dmg:[25,35],desc:'Congela al rival'},
+      {nombre:'TORMENTA ARCANA',emoji:'⚡',dmg:[40,60],desc:'Poder máximo'},
+      {nombre:'ESCUDO MAGICO',emoji:'✨',dmg:[-10,-10],desc:'Barrera',escudo:true},
+    ]},
+  { nombre:'Arquero',emoji:'🏹',stats:{f:50,m:40,e:80,d:50},
+    poderes:[
+      {nombre:'FLECHA PRECISA',emoji:'🎯',dmg:[20,35],desc:'Disparo certero'},
+      {nombre:'LLUVIA FLECHAS',emoji:'🏹',dmg:[30,50],desc:'Multi-disparo'},
+      {nombre:'FLECHA VENENO',emoji:'🐍',dmg:[15,20],desc:'Veneno lento'},
+      {nombre:'PASO LIGERO',emoji:'💨',dmg:[10,15],desc:'Esquiva',escudo:true},
+    ]},
+  { nombre:'Druida',emoji:'🌿',stats:{f:35,m:70,e:70,d:55},
+    poderes:[
+      {nombre:'RAICES MAGICAS',emoji:'🌿',dmg:[20,30],desc:'Inmoviliza'},
+      {nombre:'TORMENTA NATURAL',emoji:'🌪️',dmg:[35,45],desc:'Naturaleza'},
+      {nombre:'CURA ANCESTRAL',emoji:'💚',dmg:[-20,-30],desc:'Recupera vida',cura:true},
+      {nombre:'FORMA ANIMAL',emoji:'🐺',dmg:[30,50],desc:'Transformación'},
+    ]},
+  { nombre:'Asesino',emoji:'🗡️',stats:{f:65,m:45,e:55,d:35},
+    poderes:[
+      {nombre:'GOLPE OCULTO',emoji:'🗡️',dmg:[35,55],desc:'Desde sombras'},
+      {nombre:'VENENO MORTAL',emoji:'☠️',dmg:[20,30],desc:'Veneno élite'},
+      {nombre:'DESVANECERSE',emoji:'🌫️',dmg:[5,10],desc:'Esquiva',escudo:true},
+      {nombre:'GOLPE DOBLE',emoji:'⚡',dmg:[20,40],desc:'Dos ataques'},
+    ]},
+  { nombre:'Monarca',emoji:'👑',stats:{f:55,m:55,e:95,d:65},
+    poderes:[
+      {nombre:'DECRETO REAL',emoji:'👑',dmg:[25,40],desc:'Poder del reino'},
+      {nombre:'EJERCITO FANTASMA',emoji:'👻',dmg:[30,45],desc:'Invoca aliados'},
+      {nombre:'CARISMA',emoji:'✨',dmg:[20,35],desc:'Encanto como arma'},
+      {nombre:'ESCUDO REAL',emoji:'🛡️',dmg:[-20,-20],desc:'Protección',escudo:true},
+    ]},
+];
+
+const MISIONES = [
+  {id:'m1',zona:'bosque',nombre:'EL DRAGON DEL ABURRIMIENTO',emoji:'🐉',historia:'Un dragón ataca el reino con su aliento mortal. Solo los héroes pueden detenerlo.',tarea:'⚔️ MISION REAL: Vean una película juntos, sin celular de por medio.',recompensa:{xp:30,item:'🗡️ Espada del Entretenimiento',m:50}},
+  {id:'m2',zona:'bosque',nombre:'LA CAVERNA MISTERIOSA',emoji:'🕯️',historia:'Una caverna aguarda. Los valientes que entren descubrirán sus secretos.',tarea:'⚔️ MISION REAL: Hagan algo juntos que ninguno hizo nunca antes.',recompensa:{xp:40,item:'🕯️ Linterna de la Aventura',m:70}},
+  {id:'m3',zona:'taberna',nombre:'EL BANQUETE LEGENDARIO',emoji:'🍖',historia:'La taberna anuncia un banquete que fortalecerá a los héroes.',tarea:'⚔️ MISION REAL: Cocinen algo juntos desde cero, sin pedir delivery.',recompensa:{xp:35,item:'🍖 Corona del Cocinero',m:60}},
+  {id:'m4',zona:'taberna',nombre:'EL BARDO Y EL ENIGMA',emoji:'🎵',historia:'Un bardo guarda un enigma. Solo quienes se conozcan podrán resolverlo.',tarea:'⚔️ MISION REAL: Jueguen al ¿Me conocés? en la app Nosotros.',recompensa:{xp:50,item:'🎵 Lira del Bardo',m:80}},
+  {id:'m5',zona:'torre',nombre:'LA TORRE DE LOS SECRETOS',emoji:'🔮',historia:'La torre guarda secretos. Solo la honestidad rompe su sello.',tarea:'⚔️ MISION REAL: Cuéntense algo que nunca se dijeron.',recompensa:{xp:60,item:'🔮 Orbe de los Secretos',m:100}},
+  {id:'m6',zona:'torre',nombre:'EL HECHIZO DEL TIEMPO',emoji:'⏳',historia:'Un hechizo extraño detiene el tiempo. Solo un momento puro puede romperlo.',tarea:'⚔️ MISION REAL: 2 horas juntos sin teléfonos ni pantallas.',recompensa:{xp:70,item:'⏳ Reloj de Arena Mágico',m:110}},
+  {id:'m7',zona:'mercado',nombre:'EL MERCADER DE LOS SUEÑOS',emoji:'💫',historia:'Un mercader vende mapas de sueños. Deben compartir los suyos.',tarea:'⚔️ MISION REAL: Cuéntense 3 metas o sueños para el futuro.',recompensa:{xp:45,item:'💫 Mapa de Sueños',m:75}},
+  {id:'m8',zona:'mercado',nombre:'LA SUBASTA DE RECUERDOS',emoji:'📸',historia:'El mercado subasta recuerdos. Quienes más recuerden, más ganarán.',tarea:'⚔️ MISION REAL: Miren fotos juntos y cuenten la historia de cada una.',recompensa:{xp:40,item:'📸 Álbum Mágico',m:65}},
+  {id:'m9',zona:'castillo',nombre:'EL GRAN TORNEO',emoji:'🏆',historia:'El torneo más grande del reino. Los campeones ganarán gloria eterna.',tarea:'⚔️ MISION REAL: Jueguen un juego de mesa o cartas. El que pierde lava los platos.',recompensa:{xp:80,item:'🏆 Copa del Campeón',m:150}},
+  {id:'m10',zona:'castillo',nombre:'LA CORONACION',emoji:'👑',historia:'El reino los llama. Es hora de ser coronados monarcas del amor.',tarea:'⚔️ MISION REAL: Escriban una carta para el otro. Léanla en voz alta.',recompensa:{xp:100,item:'👑 Coronas del Reino',m:200}},
+];
+
+const ZONAS = [
+  {id:'bosque',nombre:'EL BOSQUE ENCANTADO',emoji:'🌲',desc:'Donde comenzó todo',req:0,misiones:['m1','m2']},
+  {id:'taberna',nombre:'TABERNA DEL VIAJERO',emoji:'🍺',desc:'Risas y secretos',req:1,misiones:['m3','m4']},
+  {id:'mercado',nombre:'EL GRAN MERCADO',emoji:'🏪',desc:'Historias y sueños',req:2,misiones:['m7','m8']},
+  {id:'torre',nombre:'LA TORRE ARCANA',emoji:'🗼',desc:'Misterios profundos',req:3,misiones:['m5','m6']},
+  {id:'castillo',nombre:'EL CASTILLO REAL',emoji:'🏰',desc:'El poder eterno',req:5,misiones:['m9','m10']},
+];
+
+const ITEMS = [
+  {emoji:'🗡️',nombre:'Espada del Entretenimiento',desc:'Forjada en una noche de película',mid:'m1'},
+  {emoji:'🕯️',nombre:'Linterna de la Aventura',desc:'Ilumina caminos nuevos',mid:'m2'},
+  {emoji:'🍖',nombre:'Corona del Cocinero',desc:'Para los chefs del reino',mid:'m3'},
+  {emoji:'🎵',nombre:'Lira del Bardo',desc:'Canción de conocimiento',mid:'m4'},
+  {emoji:'🔮',nombre:'Orbe de Secretos',desc:'Guarda lo compartido',mid:'m5'},
+  {emoji:'⏳',nombre:'Reloj de Arena',desc:'Tiempo sin pantallas',mid:'m6'},
+  {emoji:'💫',nombre:'Mapa de Sueños',desc:'Todos los sueños del reino',mid:'m7'},
+  {emoji:'📸',nombre:'Álbum Mágico',desc:'Los recuerdos preciados',mid:'m8'},
+  {emoji:'🏆',nombre:'Copa del Campeón',desc:'Gloria eterna',mid:'m9'},
+  {emoji:'👑',nombre:'Coronas del Reino',desc:'Monarcas del amor eterno',mid:'m10'},
+];
+
+const NIVELES = [
+  {n:1,titulo:'AVENTUREROS NOVATOS',xp:100},
+  {n:2,titulo:'EXPLORADORES VALIENTES',xp:200},
+  {n:3,titulo:'HEROES EN ASCENSO',xp:350},
+  {n:4,titulo:'GUARDIANES DEL REINO',xp:550},
+  {n:5,titulo:'CAMPEONES LEGENDARIOS',xp:800},
+  {n:6,titulo:'LEYENDAS ETERNAS',xp:99999},
+];
+
+// ══════════════════════════════
+// ESTADO
+// ══════════════════════════════
+let G = { fede:{clase:null}, luli:{clase:null}, xp:0, nivel:0, completadas:[], creando:'Fede', claseIdx:null };
+
+function guardar() { try { localStorage.setItem('na-v2', JSON.stringify(G)); } catch(e){} }
+function cargarJuego() {
+  try {
+    const s = localStorage.getItem('na-v2');
+    if (s) { G = JSON.parse(s); actualizarHub(); irA('hub'); }
+    else { irA('crear-personaje'); }
+  } catch(e) { irA('crear-personaje'); }
+}
+
+function volverANosotros() {
+  window.location.href = 'index.html';
+}
+
+function mostrarMensaje(txt) { alert(txt); }
+
+// ══════════════════════════════
+// NAVEGACIÓN
+// ══════════════════════════════
+function irA(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const t = document.getElementById(id);
+  if (t) t.classList.add('active');
+  window.scrollTo(0,0);
+  if (id==='mapa') renderMapa();
+  if (id==='misiones-screen') renderMisiones();
+  if (id==='inventario-screen') renderInventario();
+}
+
+// ══════════════════════════════
+// CREAR PERSONAJE
+// ══════════════════════════════
+function selJugador(j) {
+  G.creando = j;
+  document.querySelectorAll('.jtab').forEach((t,i) => t.classList.toggle('active',(i===0&&j==='Fede')||(i===1&&j==='Luli')));
+  G.claseIdx = null;
+  document.querySelectorAll('.clase-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('stats-box').style.display='none';
+  document.getElementById('btn-conf').style.display='none';
+}
+
+function selClase(idx) {
+  G.claseIdx = idx;
+  document.querySelectorAll('.clase-card').forEach((c,i) => c.classList.toggle('selected',i===idx));
+  const cl = CLASES[idx];
+  document.getElementById('stats-box').style.display='block';
+  document.getElementById('btn-conf').style.display='block';
+  setTimeout(()=>{
+    document.getElementById('sf').style.width = cl.stats.f+'%';
+    document.getElementById('sm').style.width = cl.stats.m+'%';
+    document.getElementById('se').style.width = cl.stats.e+'%';
+    document.getElementById('sd').style.width = cl.stats.d+'%';
+  },50);
+}
+
+function confirmarClase() {
+  if (G.claseIdx === null) return;
+  if (G.creando==='Fede') G.fede.clase = G.claseIdx;
+  else G.luli.clase = G.claseIdx;
+
+  if (G.fede.clase!==null && G.luli.clase!==null) {
+    guardar(); actualizarHub(); irA('hub');
+  } else {
+    const otro = G.creando==='Fede' ? 'Luli' : 'Fede';
+    selJugador(otro);
+    setTimeout(()=>alert(`✅ Clase guardada!\nAhora ${otro} elige la suya ⚔️`),100);
+  }
+}
+
+// ══════════════════════════════
+// HUB
+// ══════════════════════════════
+function actualizarHub() {
+  const fc = G.fede.clase!==null ? CLASES[G.fede.clase] : null;
+  const lc = G.luli.clase!==null ? CLASES[G.luli.clase] : null;
+  document.getElementById('hub-spr-fede').textContent = fc ? fc.emoji : '❓';
+  document.getElementById('hub-spr-luli').textContent = lc ? lc.emoji : '❓';
+  document.getElementById('hub-clase-fede').textContent = fc ? fc.nombre : 'Sin clase';
+  document.getElementById('hub-clase-luli').textContent = lc ? lc.nombre : 'Sin clase';
+  const niv = NIVELES[G.nivel] || NIVELES[NIVELES.length-1];
+  const nixp = NIVELES[Math.min(G.nivel+1, NIVELES.length-1)];
+  document.getElementById('hub-nivel').textContent = `NIVEL ${niv.n} — ${niv.titulo}`;
+  const pct = Math.min((G.xp / nixp.xp)*100, 100);
+  document.getElementById('xp-fill').style.width = pct+'%';
+  document.getElementById('xp-num').textContent = `${G.xp} / ${nixp.xp} XP`;
+}
+
+// ══════════════════════════════
+// MAPA
+// ══════════════════════════════
+function renderMapa() {
+  const cont = document.getElementById('mapa-cont');
+  cont.innerHTML = '';
+  ZONAS.forEach(z => {
+    const desbloq = G.completadas.length >= z.req;
+    const progreso = z.misiones.filter(id => G.completadas.includes(id)).length;
+    const div = document.createElement('div');
+    div.className = `zona-card ${desbloq ? '' : 'bloqueada'}`;
+    div.innerHTML = `
+      <div class="zona-top">
+        <div class="zona-emoji-big">${z.emoji}</div>
+        <div class="zona-txt">
+          <div class="zona-nombre">${z.nombre}</div>
+          <div class="zona-desc">${z.desc}</div>
+          ${desbloq ? `<div class="zona-prog">${progreso}/${z.misiones.length} MISIONES ✅</div>` : `<div class="zona-prog" style="color:var(--gray)">🔒 REQUIERE ${z.req} MISIONES</div>`}
+        </div>
+      </div>
+      ${desbloq ? `<div class="zona-pills">
+        ${z.misiones.map(mid => {
+          const m = MISIONES.find(x=>x.id===mid);
+          return `<span class="zpill ${G.completadas.includes(mid)?'done':''}">${m.emoji} ${G.completadas.includes(mid)?'✓':''} ${m.nombre}</span>`;
+        }).join('')}
+      </div>` : ''}
+    `;
+    if (desbloq) div.onclick = () => irA('misiones-screen');
+    cont.appendChild(div);
+  });
+}
+
+// ══════════════════════════════
+// MISIONES
+// ══════════════════════════════
+function renderMisiones() {
+  const cont = document.getElementById('misiones-cont');
+  cont.innerHTML = '';
+  let alguna = false;
+  MISIONES.forEach(m => {
+    const zona = ZONAS.find(z => z.misiones.includes(m.id));
+    if (G.completadas.length < zona.req) return;
+    alguna = true;
+    const hecha = G.completadas.includes(m.id);
+    const div = document.createElement('div');
+    div.className = `mision-card ${hecha?'done-card':''}`;
+    div.innerHTML = `
+      <div class="mc-top">
+        <div class="mc-ico">${m.emoji}</div>
+        <div class="mc-info">
+          <div class="mc-nombre">${m.nombre}</div>
+          <div class="mc-historia">${m.historia}</div>
+        </div>
+      </div>
+      <div class="mc-tarea">${m.tarea}</div>
+      <div class="mc-recomp">
+        <span class="rc">⭐ +${m.recompensa.xp} XP</span>
+        <span class="rc">🪙 +${m.recompensa.m}</span>
+        <span class="rc">${m.recompensa.item}</span>
+      </div>
+      ${hecha
+        ? `<div class="done-badge">✅ MISION COMPLETADA!</div>`
+        : `<button class="btn-completar-px" onclick="completarMision('${m.id}')">⚔️ MARCAR COMO COMPLETADA</button>`
+      }
+    `;
+    cont.appendChild(div);
+  });
+  if (!alguna) {
+    cont.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray);font-size:1rem;">Completá misiones para desbloquear zonas nuevas ⚔️</div>';
+  }
+}
+
+function completarMision(mid) {
+  if (G.completadas.includes(mid)) return;
+  const m = MISIONES.find(x=>x.id===mid);
+  G.completadas.push(mid);
+  const xpAntes = G.nivel;
+  G.xp += m.recompensa.xp;
+  while (G.nivel < NIVELES.length-1 && G.xp >= NIVELES[G.nivel+1].xp) G.nivel++;
+  guardar(); actualizarHub();
+
+  // Level up?
+  if (G.nivel > xpAntes) {
+    const fl = document.getElementById('level-flash');
+    document.getElementById('lf-txt').textContent = `⭐ NIVEL ${NIVELES[G.nivel].n} ⭐`;
+    document.getElementById('lf-sub').textContent = NIVELES[G.nivel].titulo;
+    fl.classList.add('show');
+    setTimeout(()=>fl.classList.remove('show'), 2500);
+  }
+
+  // Modal
+  document.getElementById('m-ico').textContent = m.emoji;
+  document.getElementById('m-titulo').textContent = 'MISION COMPLETADA!';
+  document.getElementById('m-txt').textContent = m.nombre;
+  document.getElementById('m-items').innerHTML = `
+    <span class="mi">⭐ +${m.recompensa.xp} XP</span>
+    <span class="mi">🪙 +${m.recompensa.m}</span>
+    <span class="mi">${m.recompensa.item}</span>
+  `;
+  document.getElementById('modal').classList.add('show');
+  renderMisiones();
+}
+
+function cerrarModal() { document.getElementById('modal').classList.remove('show'); }
+
+// ══════════════════════════════
+// INVENTARIO
+// ══════════════════════════════
+function renderInventario() {
+  const cont = document.getElementById('inv-cont');
+  cont.innerHTML = '';
+  ITEMS.forEach(item => {
+    const desbloq = G.completadas.includes(item.mid);
+    const div = document.createElement('div');
+    div.className = `inv-item ${desbloq?'':'locked'}`;
+    div.innerHTML = `
+      <span class="inv-ico">${item.emoji}</span>
+      <span class="inv-name">${item.nombre}</span>
+      <span class="inv-desc">${desbloq ? item.desc : '???'}</span>
+    `;
+    cont.appendChild(div);
+  });
+}
+
+// ══════════════════════════════
+// COMBATE
+// ══════════════════════════════
+let CB = {hpF:100,hpL:100,turno:'Fede',activo:true};
+
+function iniciarCombate() {
+  CB = {hpF:100,hpL:100,turno:'Fede',activo:true};
+  const fc = G.fede.clase!==null ? CLASES[G.fede.clase] : CLASES[0];
+  const lc = G.luli.clase!==null ? CLASES[G.luli.clase] : CLASES[1];
+  document.getElementById('cb-spr-fede').textContent = fc.emoji;
+  document.getElementById('cb-spr-luli').textContent = lc.emoji;
+  actualizarHP();
+  document.getElementById('combat-log').textContent = '¡Que comience el duelo! Fede ataca primero.';
+  document.getElementById('turno-lbl').textContent = '⏳ TURNO DE FEDE — ELIGE UN PODER';
+  document.getElementById('btn-revancha').style.display='none';
+  renderPoderes();
+}
+
+function renderPoderes() {
+  const grid = document.getElementById('poderes-grid');
+  grid.innerHTML='';
+  const idx = CB.turno==='Fede' ? G.fede.clase : G.luli.clase;
+  const clase = CLASES[idx!==null ? idx : (CB.turno==='Fede' ? 0 : 1)];
+  clase.poderes.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className='poder-btn';
+    btn.disabled=!CB.activo;
+    btn.innerHTML=`<span class="pb-ico">${p.emoji}</span><span class="pb-name">${p.nombre}</span><span class="pb-dmg">${p.cura?'❤️ Cura':p.escudo?'🛡️ Defiende':`💥 ${p.dmg[0]}-${p.dmg[1]}`}</span>`;
+    btn.onclick=()=>usarPoder(p);
+    grid.appendChild(btn);
+  });
+}
+
+function usarPoder(p) {
+  if (!CB.activo) return;
+  const atk = CB.turno, def = atk==='Fede'?'Luli':'Fede';
+  let dmg = Math.floor(Math.random()*(p.dmg[1]-p.dmg[0]+1))+p.dmg[0];
+  let log = '';
+
+  if (p.cura) {
+    if (atk==='Fede') CB.hpF=Math.min(100,CB.hpF+Math.abs(dmg));
+    else CB.hpL=Math.min(100,CB.hpL+Math.abs(dmg));
+    log=`💚 ${atk} usa ${p.nombre} y recupera ${Math.abs(dmg)} HP!`;
+  } else if (p.escudo) {
+    const r=Math.floor(Math.abs(dmg)*0.5);
+    if (def==='Luli') CB.hpL=Math.max(0,CB.hpL-r);
+    else CB.hpF=Math.max(0,CB.hpF-r);
+    log=`🛡️ ${atk} usa ${p.nombre}! Bloquea y contraataca por ${r} DMG`;
+  } else {
+    if (def==='Luli') CB.hpL=Math.max(0,CB.hpL-dmg);
+    else CB.hpF=Math.max(0,CB.hpF-dmg);
+    log=`${p.emoji} ${atk} usa ${p.nombre}! ${def} recibe ${dmg} DMG`;
+  }
+
+  actualizarHP();
+  document.getElementById('combat-log').textContent = log;
+
+  if (CB.hpF<=0||CB.hpL<=0) {
+    CB.activo=false;
+    const ganador = CB.hpF>0?'Fede':'Luli';
+    setTimeout(()=>{
+      document.getElementById('combat-log').textContent = `👑 ${ganador.toUpperCase()} GANA EL DUELO! (Y después se dan un abrazo 🥺)`;
+      document.getElementById('turno-lbl').textContent = `🏆 ${ganador.toUpperCase()} ES EL CAMPEON!`;
+      document.getElementById('btn-revancha').style.display='block';
+      document.querySelectorAll('.poder-btn').forEach(b=>b.disabled=true);
+    },400);
+    return;
+  }
+
+  CB.turno=def;
+  document.getElementById('turno-lbl').textContent=`⏳ TURNO DE ${def.toUpperCase()} — ELIGE UN PODER`;
+  renderPoderes();
+}
+
+function actualizarHP() {
+  const bf=document.getElementById('cb-hp-fede');
+  const bl=document.getElementById('cb-hp-luli');
+  bf.style.width=CB.hpF+'%';
+  bl.style.width=CB.hpL+'%';
+  bf.className='hp-fill'+(CB.hpF<30?' low':'');
+  bl.className='hp-fill'+(CB.hpL<30?' low':'');
+  document.getElementById('cb-hp-fede-n').textContent=`${CB.hpF}/100`;
+  document.getElementById('cb-hp-luli-n').textContent=`${CB.hpL}/100`;
+}
+
+// ══════════════════════════════
+// ESTRELLAS + PARTÍCULAS PIXEL
+// ══════════════════════════════
+(function(){
+  const sc=document.getElementById('stars');
+  const colors=['#e0e0f0','#ffd700','#c77dff','#4ecdc4'];
+  for(let i=0;i<60;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=Math.random()<0.3?3:Math.random()<0.5?2:1;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};--d:${2+Math.random()*4}s;--delay:${-Math.random()*4}s;`;
+    sc.appendChild(s);
+  }
+  const pc=document.getElementById('pixels');
+  const pcolors=['#ffd700','#c77dff','#4ecdc4','#ff9f1c','#e63946'];
+  function mkPx(){
+    const p=document.createElement('div');
+    p.className='px-particle';
+    const dur=6+Math.random()*8;
+    p.style.cssText=`left:${Math.random()*100}%;background:${pcolors[Math.floor(Math.random()*pcolors.length)]};--d:${dur}s;--delay:${-Math.random()*dur}s;--dx:${(Math.random()-0.5)*80}px;`;
+    pc.appendChild(p);
+    setTimeout(()=>p.remove(),(dur+2)*1000);
+  }
+  for(let i=0;i<15;i++) mkPx();
+  setInterval(mkPx,800);
+})();
+</script>
+</body>
+</html>
